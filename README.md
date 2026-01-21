@@ -77,7 +77,8 @@ lib/
  ┃ ┃ ┣ add_product_page.dart
  ┃ ┃ ┣ product_detail_page.dart
  ┃ ┃ ┗ product_list_page.dart
- ┃ ┗ dashboard_page.dart
+ ┃ ┣ dashboard_page.dart
+ ┃ ┗ exit_helper.dart
  ┣ firebase_options.dart
  ┗ main.dart
 ```
