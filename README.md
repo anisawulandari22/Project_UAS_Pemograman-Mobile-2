@@ -3,45 +3,83 @@
 
 My Daily Glam adalah aplikasi pendamping kecantikan dan perawatan diri (self-care) yang dirancang untuk membantu pengguna mengelola rutinitas harian, inventaris produk kecantikan, dengan estetika yang "Girly & Cheerful".
 
-
 ## Fitur Aplikasi
-### 1. Halaman Login
 
-Halaman Login yang bersih dengan ilustrasi cantik untuk menyambut pengguna ke dunia kecantikan mereka.
+1. Sistem Autentikasi: Login dan Register menggunakan Firebase Auth untuk keamanan data pengguna.
+2. Dashboard Personal: Pusat kendali kecantikan yang menampilkan ringkasan Mood harian dan entri Jurnal terbaru secara real-time.
+3. Jurnal Perawatan Diri: Ruang khusus untuk mencatat rutinitas perawatan kulit dan tubuh.
+4. Manajemen Produk (REST API):
+   * Mengelola koleksi kosmetik dengan data yang diambil dari MockAPI.io.
+   * Tampilan list produk yang dinamis dan detail produk yang mendalam.
+5. Glam Wishlist: Tempat khusus untuk menyimpan produk impian untuk referensi belanja masa depan.
+6. Mood Tracker Harian: Melacak kesehatan mental dan kebahagiaan pengguna setiap hari dengan antarmuka yang interaktif.
 
----
-### 2. Register
+### 
 
-Halaman Register yang bersih dengan ilustrasi cantik untuk menyambut pengguna ke dunia kecantikan mereka.
+## 1. Persiapan Awal
 
----
-### 3. Dashboard Personal
+### a. pusbec.yaml
 
-Pusat kendali kecantikan. Menampilkan ringkasan Mood harian, dan entri Jurnal terbaru.
+Buka file `pubspec.yaml`, lalu tambahkan:
 
----
-### 4. Jurnal Perawatan Diri
+```yaml
+dependencies:
 
-Ruang khusus untuk mencatat rutinitas perawatan kulit, dan tubuh.
-* Pencatatan produk yang digunakan setiap sesi.
+  # Firebase & Database
+  firebase_core: ^3.0.0
+  firebase_auth: ^5.0.0
+  cloud_firestore: ^5.0.0
+  firebase_storage: ^12.0.0
+  intl: ^0.19.0
 
----
-### 5. Manajemen Produk
+  # API & Networking
+  image_picker: ^1.0.7
+  http: ^1.2.1
 
-Kelola koleksi kosmetik Anda agar tidak ada produk yang terlupakan.
+  # UI & Components
+  table_calendar: ^3.1.1
+  google_fonts: ^6.2.1
 
-* Daftar Produk: Tampilan grid yang rapi dengan foto produk.
-* Formulir Tambah Produk: Input detail seperti merek, kategori, hingga tanggal kedaluwarsa.
-* Detail Produk: Informasi mendalam tentang kandungan dan cara pakai.
+  # Animation & Assets
+  lottie: ^3.1.0
+```
 
----
-### 6. Glam Wishlist
+Lalu jalankan:
 
-Tempat khusus untuk menyimpan produk incaran. Simpan produk impian pengguna untuk referensi belanja masa depan.
+```bash
+flutter pub get
+```
 
----
-### 7. Mood Tracker Harian
+### b. Struktur Folder
 
-Kecantikan dimulai dari dalam.
+```
+lib/
+ ┣ core/
+ ┃ ┣ app_color.dart
+ ┃ ┗ constants.dart
+ ┣ models/
+ ┃ ┗ product_model.dart
+ ┣ services/
+ ┃ ┣ api_service.dart
+ ┃ ┗ auth_service.dart
+ ┣ views/
+ ┃ ┣ auth/
+ ┃ ┃ ┣ login_page.dart
+ ┃ ┃ ┗ register_page.dart
+ ┃ ┣ mood/
+ ┃ ┃ ┗ mood_tracker_page.dart
+ ┃ ┣ pages/
+ ┃ ┃ ┣ add_journal_page.dart
+ ┃ ┃ ┣ add_wishlist_page.dart
+ ┃ ┃ ┣ journal_page.dart
+ ┃ ┃ ┗ wishlist_page.dart
+ ┃ ┣ products/
+ ┃ ┃ ┣ add_product_page.dart
+ ┃ ┃ ┣ product_detail_page.dart
+ ┃ ┃ ┗ product_list_page.dart
+ ┃ ┗ dashboard_page.dart
+ ┣ firebase_options.dart
+ ┗ main.dart
+```
 
 ---
