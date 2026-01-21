@@ -54,9 +54,6 @@ flutter pub get
 
 ```
 lib/
- ┣ core/
- ┃ ┣ app_color.dart
- ┃ ┗ constants.dart
  ┣ models/
  ┃ ┗ product_model.dart
  ┣ services/
