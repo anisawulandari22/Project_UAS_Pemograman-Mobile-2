@@ -6,7 +6,7 @@ import '../../services/api_service.dart';
 import '../../models/product_model.dart';
 
 class AddProductPage extends StatefulWidget {
-  final Product? product; 
+  final Product? product;
   const AddProductPage({super.key, this.product});
 
   @override
@@ -25,7 +25,7 @@ class _AddProductPageState extends State<AddProductPage> {
   late TextEditingController _deskripsiController;
 
   String selectedCategory = "Pembersih";
-  Uint8List? _webImage; 
+  Uint8List? _webImage;
   bool _isLoading = false;
 
   final List<String> categories = [
@@ -75,16 +75,16 @@ class _AddProductPageState extends State<AddProductPage> {
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery, 
-      imageQuality: 10, 
-      maxWidth: 400,  
-      maxHeight: 400, 
+      source: ImageSource.gallery,
+      imageQuality: 10,
+      maxWidth: 400,
+      maxHeight: 400,
     );
 
     if (image != null) {
-      var bytes = await image.readAsBytes(); 
+      var bytes = await image.readAsBytes();
       setState(() {
-        _webImage = bytes; 
+        _webImage = bytes;
       });
     }
   }
@@ -100,7 +100,7 @@ class _AddProductPageState extends State<AddProductPage> {
     setState(() => _isLoading = true);
 
     try {
-      String imageBase64 = widget.product?.imageUrl ?? ""; 
+      String imageBase64 = widget.product?.imageUrl ?? "";
       if (_webImage != null) {
         imageBase64 = base64Encode(_webImage!);
       }
@@ -121,10 +121,10 @@ class _AddProductPageState extends State<AddProductPage> {
       } else {
         success = await ApiService().updateProduct(widget.product!.id, productData);
       }
-    
+
       if (success) {
         if (!mounted) return;
-        Navigator.pop(context, true); 
+        Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.green,
@@ -148,18 +148,18 @@ class _AddProductPageState extends State<AddProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgSoft,
-      body: _isLoading 
+      body: _isLoading
         ? Center(child: CircularProgressIndicator(color: pinkPrimary))
         : SingleChildScrollView(
             child: Column(
               children: [
                 _buildHeader(),
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                  padding: const EdgeInsets.all(40),
+                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  padding: const EdgeInsets.all(25),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(25),
                     boxShadow: [
                       BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20)
                     ]
@@ -169,25 +169,25 @@ class _AddProductPageState extends State<AddProductPage> {
                     children: [
                       _buildLabel("Gambar Produk"),
                       _buildImageUploader(),
-                      const SizedBox(height: 25),
+                      const SizedBox(height: 20),
                       _buildLabel("Nama Produk"),
                       _buildTextField(_namaController, "misal: Glow Serum"),
                       _buildLabel("Merek"),
                       _buildTextField(_merekController, "misal: skin1004"),
                       _buildLabel("Kategori"),
                       Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: categories.map((cat) => _buildCategoryChip(cat)).toList(),
                       ),
-                      const SizedBox(height: 25),
+                      const SizedBox(height: 20),
                       _buildLabel("Harga"),
                       _buildTextField(_hargaController, "misal: 180000", isNumber: true),
                       _buildLabel("Tanggal Kedaluwarsa"),
                       _buildTextField(_tglController, "Pilih tanggal...", isDate: true),
                       _buildLabel("Deskripsi"),
-                      _buildTextField(_deskripsiController, "misal: Centella Asiatica", maxLines: 4),
-                      const SizedBox(height: 40),
+                      _buildTextField(_deskripsiController, "misal: Centella Asiatica", maxLines: 3),
+                      const SizedBox(height: 30),
                       
                       SizedBox(
                         width: double.infinity,
@@ -199,8 +199,8 @@ class _AddProductPageState extends State<AddProductPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: pinkPrimary,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 20),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                           ),
                         ),
                       ),
@@ -215,28 +215,29 @@ class _AddProductPageState extends State<AddProductPage> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.only(top: 40, left: 40, right: 40),
+      padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
       child: Row(
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back_ios_new, size: 20),
             style: IconButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: pinkPrimary,
+              elevation: 2,
             ),
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 15),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.product == null ? "Tambah Produk Baru" : "Edit Produk",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: pinkPrimary)),
+                Text(widget.product == null ? "Tambah Produk" : "Edit Produk",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: pinkPrimary)),
                 Text(widget.product == null 
-                  ? "Isi detail produk kecantikanmu dengan lengkap" 
-                  : "Ubah detail produk kecantikanmu",
-                  style: const TextStyle(color: Colors.black54)),
+                  ? "Lengkapi detail produkmu" 
+                  : "Ubah detail produkmu",
+                  style: const TextStyle(color: Colors.black54, fontSize: 13)),
               ],
             ),
           ),
@@ -259,7 +260,7 @@ class _AddProductPageState extends State<AddProductPage> {
       onTap: _pickImage,
       child: Container(
         width: double.infinity,
-        height: 180,
+        height: 160,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.pink.shade50, width: 2),
           borderRadius: BorderRadius.circular(15),
@@ -277,7 +278,8 @@ class _AddProductPageState extends State<AddProductPage> {
                       padding: const EdgeInsets.all(10),
                       child: CircleAvatar(
                         backgroundColor: pinkPrimary,
-                        child: const Icon(Icons.edit, color: Colors.white, size: 20),
+                        radius: 18,
+                        child: const Icon(Icons.edit, color: Colors.white, size: 16),
                       ),
                     ),
                   ],
@@ -285,10 +287,10 @@ class _AddProductPageState extends State<AddProductPage> {
               : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.file_upload_outlined, size: 40, color: pinkPrimary),
-                    const SizedBox(height: 10),
-                    const Text("Klik untuk unggah gambar", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text("PNG, JPG hingga 5MB", style: TextStyle(color: textHint, fontSize: 12)),
+                    Icon(Icons.file_upload_outlined, size: 35, color: pinkPrimary),
+                    const SizedBox(height: 8),
+                    const Text("Klik untuk unggah gambar", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    Text("PNG, JPG hingga 5MB", style: TextStyle(color: textHint, fontSize: 11)),
                   ],
                 ),
         ),
@@ -298,29 +300,30 @@ class _AddProductPageState extends State<AddProductPage> {
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Text(text,
-        style: const TextStyle(color: Color(0xFF8A5CBF), fontWeight: FontWeight.bold, fontSize: 14)),
+        style: const TextStyle(color: Color(0xFF8A5CBF), fontWeight: FontWeight.bold, fontSize: 13)),
     );
   }
 
   Widget _buildTextField(TextEditingController controller, String hint, 
       {bool isNumber = false, bool isDate = false, int maxLines = 1}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 15),
       child: TextField(
         controller: controller,
         readOnly: isDate,
         onTap: isDate ? _selectDate : null,
         keyboardType: isNumber ? TextInputType.number : TextInputType.text,
         maxLines: maxLines,
+        style: const TextStyle(fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: textHint, fontStyle: FontStyle.italic),
+          hintStyle: TextStyle(color: textHint, fontStyle: FontStyle.italic, fontSize: 13),
           filled: true,
           fillColor: Colors.white,
-          suffixIcon: isDate ? const Icon(Icons.calendar_today_outlined, size: 18) : null,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          suffixIcon: isDate ? Icon(Icons.calendar_today_outlined, size: 16, color: pinkPrimary) : null,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.grey.shade200),
@@ -339,16 +342,17 @@ class _AddProductPageState extends State<AddProductPage> {
     return GestureDetector(
       onTap: () => setState(() => selectedCategory = label),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isSelected ? pinkPrimary.withValues(alpha: 0.1) : Colors.white,
           border: Border.all(color: isSelected ? pinkPrimary : Colors.grey.shade200, width: 1.5),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Text(label,
           style: TextStyle(
-            color: isSelected ? pinkPrimary : Colors.grey.shade400,
+            color: isSelected ? pinkPrimary : Colors.grey.shade500,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 12,
           ),
         ),
       ),
