@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import '../dashboard_page.dart';
 import '../exit_helper.dart';
 import 'journal_page.dart';
@@ -18,71 +19,104 @@ class _MoodPageState extends State<MoodPage> {
   final Color pinkPrimary = const Color(0xFFFF69B4);
   final Color pinkDark = const Color(0xFFD02090);
   final Color bgSoft = const Color(0xFFFFF5F7);
-  final Color pinkLight = const Color(0xFFFFE4E9);
   final Color yellowSoft = const Color(0xFFFFF9E6);
   final Color yellowText = const Color(0xFFD4A017);
   
-  String selectedMenu = "Mood";
+  int _selectedIndex = 4;
+
+  void _onItemTapped(int index) {
+    if (index == _selectedIndex) return;
+    
+    Widget targetPage;
+    switch (index) {
+      case 0: targetPage = const DashboardPage(); break;
+      case 1: targetPage = const JournalPage(); break;
+      case 2: targetPage = const ProductListPage(); break;
+      case 3: targetPage = const WishlistPage(); break;
+      case 4: targetPage = const MoodPage(); break;
+      default: return;
+    }
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => targetPage),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgSoft,
-      body: Row(
-        children: [
-          _buildSidebar(),
-          Expanded(
-            child: Column(
-              children: [
-                _buildHeader(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(40),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Pelacak Mood",
-                          style: TextStyle(
-                            fontSize: 32, 
-                            fontWeight: FontWeight.w900, 
-                            color: pinkDark
-                          ),
-                        ),
-                        const Text(
-                          "Pantau suasana hati dan kesejahteraanmu secara real-time",
-                          style: TextStyle(color: Colors.grey, fontSize: 16),
-                        ),
-                        const SizedBox(height: 40),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildCalendarCard(),
-                            const SizedBox(width: 40),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+        title: Text("My Daily Glam", 
+          style: TextStyle(color: pinkDark, fontWeight: FontWeight.bold, fontSize: 18)),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: pinkDark),
+            onPressed: () => ExitHelper.logout(context),
+          )
+        ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Pelacak Mood",
+                style: TextStyle(
+                  fontSize: 26, 
+                  fontWeight: FontWeight.w900, 
+                  color: pinkDark
                 ),
-              ],
-            ),
+              ),
+              const Text(
+                "Pantau suasana hati dan kesejahteraanmu",
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+              const SizedBox(height: 25),
+              _buildCalendarCard(),
+              const SizedBox(height: 20),
+              _buildLegend(),
+            ],
           ),
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        selectedItemColor: pinkPrimary,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Beranda"),
+          BottomNavigationBarItem(icon: Icon(Icons.auto_stories), label: "Jurnal"),
+          BottomNavigationBarItem(icon: Icon(Icons.inventory_2), label: "Produk"),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Wishlist"),
+          BottomNavigationBarItem(icon: Icon(Icons.mood), label: "Mood"),
         ],
       ),
     );
   }
 
   Widget _buildCalendarCard() {
+    String currentMonthName = DateFormat('MMMM yyyy').format(DateTime.now());
+
     return Container(
-      width: 450,
-      padding: const EdgeInsets.all(30),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02), 
+            color: Colors.black.withOpacity(0.02), 
             blurRadius: 10, 
             offset: const Offset(0, 4)
           )
@@ -94,16 +128,16 @@ class _MoodPageState extends State<MoodPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Januari 2026", 
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+              Text(
+                currentMonthName, 
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
               ),
               Icon(Icons.calendar_month, color: pinkPrimary),
             ],
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 20),
           _buildDaysHeader(),
-          const SizedBox(height: 15),
+          const SizedBox(height: 10),
           _buildDaysGrid(), 
         ],
       ),
@@ -114,12 +148,11 @@ class _MoodPageState extends State<MoodPage> {
     List<String> days = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: days.map((day) => SizedBox(
-        width: 45,
+      children: days.map((day) => Expanded(
         child: Center(
           child: Text(
             day, 
-            style: TextStyle(color: pinkDark, fontWeight: FontWeight.bold, fontSize: 12)
+            style: TextStyle(color: pinkDark, fontWeight: FontWeight.bold, fontSize: 11)
           )
         ),
       )).toList(),
@@ -128,6 +161,9 @@ class _MoodPageState extends State<MoodPage> {
 
   Widget _buildDaysGrid() {
     final user = FirebaseAuth.instance.currentUser;
+    DateTime now = DateTime.now();
+    int daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
+    int firstDayOffset = DateTime(now.year, now.month, 1).weekday % 7;
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
@@ -136,14 +172,14 @@ class _MoodPageState extends State<MoodPage> {
           .collection('moods')
           .snapshots(),
       builder: (context, snapshot) {
-        Map<int, List<dynamic>> firestoreMoodData = {};
+        Map<int, Map<String, dynamic>> firestoreMoodData = {};
 
         if (snapshot.hasData) {
           for (var doc in snapshot.data!.docs) {
             try {
               DateTime date = DateTime.parse(doc.id);
-              if (date.month == 1 && date.year == 2026) {
-                firestoreMoodData[date.day] = [doc['moodType'], doc['note'] ?? ""];
+              if (date.month == now.month && date.year == now.year) {
+                firestoreMoodData[date.day] = doc.data() as Map<String, dynamic>;
               }
             } catch (e) {
               debugPrint("Error parsing date: $e");
@@ -151,40 +187,45 @@ class _MoodPageState extends State<MoodPage> {
           }
         }
 
-        return Wrap(
-          spacing: 12,
-          runSpacing: 15,
-          children: List.generate(31 + 4, (index) {
-            if (index < 4) return const SizedBox(width: 45, height: 45); 
-            int day = index - 3;
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 7,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+          ),
+          itemCount: daysInMonth + firstDayOffset,
+          itemBuilder: (context, index) {
+            if (index < firstDayOffset) return const SizedBox.shrink(); 
+            
+            int day = index - firstDayOffset + 1;
             var data = firestoreMoodData[day];
 
             return GestureDetector(
               onTap: () => _showMoodDialog(day, data),
               child: Container(
-                width: 45,
-                height: 45,
                 decoration: BoxDecoration(
-                  color: data != null ? _getMoodColor(data[0]) : Colors.transparent,
+                  color: data != null ? _getMoodColor(data['moodType'] ?? 1) : Colors.transparent,
                   shape: BoxShape.circle,
-                  border: data == null ? Border.all(color: bgSoft, width: 2) : null,
+                  border: data == null ? Border.all(color: bgSoft, width: 1) : null,
                 ),
                 child: Center(
                   child: data != null 
-                    ? _getMoodIcon(data[0])
-                    : Text("$day", style: TextStyle(color: Colors.grey.shade400, fontSize: 13)),
+                    ? _getMoodIcon(data['moodType'] ?? 1, size: 18)
+                    : Text("$day", style: TextStyle(color: Colors.grey.shade400, fontSize: 12)),
                 ),
               ),
             );
-          }),
+          },
         );
       },
     );
   }
 
-  void _showMoodDialog(int day, List<dynamic>? existingData) {
-    int tempSelectedMood = existingData?[0] ?? 1;
-    TextEditingController descController = TextEditingController(text: existingData?[1] ?? "");
+  void _showMoodDialog(int day, Map<String, dynamic>? existingData) {
+    int tempSelectedMood = existingData?['moodType'] ?? 1;
+    TextEditingController descController = TextEditingController(text: existingData?['note'] ?? "");
     final user = FirebaseAuth.instance.currentUser;
 
     showDialog(
@@ -193,96 +234,134 @@ class _MoodPageState extends State<MoodPage> {
         builder: (context, setDialogState) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
           backgroundColor: Colors.white,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Bagaimana perasaanmu tanggal $day?", 
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)
-              ),
-              const SizedBox(height: 25),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [1, 2, 3, 4].map((type) {
-                  bool isThisSelected = tempSelectedMood == type;
-                  return GestureDetector(
-                    onTap: () => setDialogState(() => tempSelectedMood = type),
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: _getMoodColor(type).withValues(alpha: isThisSelected ? 1 : 0.2),
-                          radius: 28,
-                          child: _getMoodIcon(type, size: 28, color: isThisSelected ? Colors.white : _getMoodColor(type)),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _getMoodName(type), 
-                          style: TextStyle(
-                            fontSize: 11, 
-                            fontWeight: isThisSelected ? FontWeight.bold : FontWeight.normal,
-                            color: isThisSelected ? pinkDark : Colors.grey
-                          )
-                        ),
-                      ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Mood Tanggal $day", 
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)
+                ),
+                const SizedBox(height: 20),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 15,
+                  runSpacing: 15,
+                  children: [1, 2, 3, 4].map((type) {
+                    bool isThisSelected = tempSelectedMood == type;
+                    return GestureDetector(
+                      onTap: () => setDialogState(() => tempSelectedMood = type),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: _getMoodColor(type).withOpacity(isThisSelected ? 1 : 0.1),
+                            radius: 25,
+                            child: _getMoodIcon(type, size: 24, color: isThisSelected ? Colors.white : _getMoodColor(type)),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            _getMoodName(type), 
+                            style: TextStyle(
+                              fontSize: 10, 
+                              fontWeight: isThisSelected ? FontWeight.bold : FontWeight.normal,
+                              color: isThisSelected ? pinkDark : Colors.grey
+                            )
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: descController,
+                  maxLines: 2,
+                  decoration: InputDecoration(
+                    hintText: "Ceritakan perasaanmu...",
+                    hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+                    filled: true,
+                    fillColor: bgSoft,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
                     ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 25),
-              TextField(
-                controller: descController,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: "Ceritakan sedikit perasaanmu...",
-                  hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                  filled: true,
-                  fillColor: bgSoft.withValues(alpha: 0.5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide.none,
                   ),
                 ),
-              ),
-              const SizedBox(height: 25),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (user == null) return;
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (user == null) return;
+                      DateTime now = DateTime.now();
+                      String dateId = "${now.year}-${now.month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}";
 
-                    String dateId = "2026-01-${day.toString().padLeft(2, '0')}";
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .collection('moods')
+                          .doc(dateId)
+                          .set({
+                        'moodType': tempSelectedMood,
+                        'label': _getMoodName(tempSelectedMood), 
+                        'date': dateId, 
+                        'note': descController.text,
+                        'timestamp': FieldValue.serverTimestamp(),
+                      }, SetOptions(merge: true));
 
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(user.uid)
-                        .collection('moods')
-                        .doc(dateId)
-                        .set({
-                      'moodType': tempSelectedMood,
-                      'note': descController.text,
-                      'timestamp': FieldValue.serverTimestamp(),
-                    });
-
-                    if (!context.mounted) return;
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: pinkPrimary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    elevation: 0,
+                      if (!context.mounted) return;
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Mood tanggal $day disimpan!"), backgroundColor: pinkDark)
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: pinkPrimary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                    ),
+                    child: const Text("SIMPAN", style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
-                  child: const Text("SIMPAN", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1)),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-  
+
+  Widget _buildLegend() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _legendItem(1, "Senang"),
+            _legendItem(2, "Biasa"),
+            _legendItem(3, "Stress"),
+            _legendItem(4, "Hebat"),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _legendItem(int type, String label) {
+    return Row(
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: _getMoodColor(type), shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 5),
+        Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+      ],
+    );
+  }
+
   String _getMoodName(int type) {
     switch (type) {
       case 1: return "Senang";
@@ -313,89 +392,5 @@ class _MoodPageState extends State<MoodPage> {
       default: icon = Icons.mood;
     }
     return Icon(icon, color: color, size: size);
-  }
-
-  Widget _buildSidebar() {
-    return Container(
-      width: 260,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(right: BorderSide(color: Color(0xFFFFE4E9))),
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.face_retouching_natural, color: pinkDark, size: 32),
-              const SizedBox(width: 10),
-              Text("My Daily Glam", 
-                style: TextStyle(color: pinkDark, fontWeight: FontWeight.w900, fontSize: 18)),
-            ],
-          ),
-          const SizedBox(height: 30),
-          _buildNavMenu(Icons.home, "Beranda", const DashboardPage()),
-          _buildNavMenu(Icons.auto_stories, "Jurnal", const JournalPage()),
-          _buildNavMenu(Icons.inventory_2, "Produk", const ProductListPage()),
-          _buildNavMenu(Icons.favorite, "Wishlist", const WishlistPage()),
-          _buildNavMenu(Icons.mood, "Mood", const MoodPage()),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavMenu(IconData icon, String title, Widget target) {
-    bool isSelected = selectedMenu == title;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isSelected ? pinkPrimary : Colors.transparent,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: ListTile(
-          leading: Icon(icon, color: isSelected ? Colors.white : Colors.grey),
-          title: Text(
-            title,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.grey,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-          onTap: () {
-            if (isSelected) return;
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => target),
-              (route) => false,
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      height: 70,
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          ElevatedButton.icon(
-            onPressed: () => ExitHelper.logout(context),
-            icon: const Icon(Icons.logout, size: 18),
-            label: const Text("Keluar"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: pinkPrimary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
