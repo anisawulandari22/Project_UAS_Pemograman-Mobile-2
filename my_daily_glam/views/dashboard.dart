@@ -115,34 +115,40 @@ class DashboardPageState extends State<DashboardPage> {
                     }
                   }
 
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildBannerGlam(),
-                        const SizedBox(height: 25),
-                        GridView.count(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 15,
-                          mainAxisSpacing: 15,
-                          childAspectRatio: 1.4,
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      bool isWeb = constraints.maxWidth > 800;
+
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildActionCard("Jurnal", Icons.auto_stories, const Color(0xFFFFF4E6), const LinearGradient(colors: [Color(0xFFFFD194), Color(0xFFFFB347)])),
-                            _buildActionCard("Produk", Icons.inventory_2, const Color(0xFFF8E8FF), const LinearGradient(colors: [Color(0xFFE0C3FC), Color(0xFF8E2DE2)])),
-                            _buildActionCard("Wishlist", Icons.favorite, const Color(0xFFFFE8EC), const LinearGradient(colors: [Color(0xFFFF9A9E), Color(0xFFF06292)])),
-                            _buildActionCard("Mood", Icons.mood, const Color(0xFFE8F4FF), const LinearGradient(colors: [Color(0xFFA1C4FD), Color(0xFF3081ED)])),
+                            _buildBannerGlam(),
+                            const SizedBox(height: 25),
+                            GridView.count(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: isWeb ? 4 : 2, 
+                              crossAxisSpacing: 15,
+                              mainAxisSpacing: 15,
+                              childAspectRatio: isWeb ? 1.8 : 1.4,
+                              children: [
+                                _buildActionCard("Jurnal", Icons.auto_stories, const Color(0xFFFFF4E6), const LinearGradient(colors: [Color(0xFFFFD194), Color(0xFFFFB347)])),
+                                _buildActionCard("Produk", Icons.inventory_2, const Color(0xFFF8E8FF), const LinearGradient(colors: [Color(0xFFE0C3FC), Color(0xFF8E2DE2)])),
+                                _buildActionCard("Wishlist", Icons.favorite, const Color(0xFFFFE8EC), const LinearGradient(colors: [Color(0xFFFF9A9E), Color(0xFFF06292)])),
+                                _buildActionCard("Mood", Icons.mood, const Color(0xFFE8F4FF), const LinearGradient(colors: [Color(0xFFA1C4FD), Color(0xFF3081ED)])),
+                              ],
+                            ),
+                            const SizedBox(height: 30),
+                            _buildSkincareSection(user?.uid, dateId),
+                            const SizedBox(height: 20),
+                            _buildMoodSection(),
+                            const SizedBox(height: 20),
                           ],
                         ),
-                        const SizedBox(height: 30),
-                        _buildSkincareSection(user?.uid, dateId),
-                        const SizedBox(height: 20),
-                        _buildMoodSection(),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               );
@@ -156,7 +162,7 @@ class DashboardPageState extends State<DashboardPage> {
 
   Widget _buildBottomNav() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Color(0xFFFFE4E9))),
       ),
@@ -277,11 +283,12 @@ class DashboardPageState extends State<DashboardPage> {
 
   Widget _buildSkincareSection(String? uid, String dateId) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white, 
         borderRadius: BorderRadius.circular(25),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)]
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10)]
       ),
       child: Column(
         children: [
@@ -335,11 +342,12 @@ class DashboardPageState extends State<DashboardPage> {
 
   Widget _buildMoodSection() {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white, 
         borderRadius: BorderRadius.circular(25),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)]
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10)]
       ),
       child: Column(
         children: [
@@ -367,7 +375,7 @@ class DashboardPageState extends State<DashboardPage> {
                     .collection('users')
                     .doc(user.uid)
                     .collection('moods')
-                    .doc(dateId)
+                    .doc(dateId) 
                     .set({
                   'moodType': moodId,
                   'label': moodLabel,
@@ -401,7 +409,7 @@ class DashboardPageState extends State<DashboardPage> {
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             width: 50, height: 50,
-            decoration: BoxDecoration(color: active ? color : Colors.grey.withOpacity(0.1), shape: BoxShape.circle),
+            decoration: BoxDecoration(color: active ? color : Colors.grey.withValues(alpha:0.1), shape: BoxShape.circle),
             child: Center(child: _getMoodIcon(moodData[index]["id"], color: active ? Colors.white : Colors.grey)),
           ),
           const SizedBox(height: 8),
