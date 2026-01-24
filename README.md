@@ -16,7 +16,7 @@ My Daily Glam adalah aplikasi pendamping kecantikan dan perawatan diri (self-car
 
 ### 
 
-## 1. Persiapan Awal
+## Persiapan Awal
 
 ### a. pusbec.yaml
 
@@ -80,8 +80,7 @@ lib/
  ┗ main.dart
 
 ```
-## 2. Demo Aplikasi
+## Tautan Proyek Glam
 
-https://drive.google.com/drive/folders/1N3Zc8Ne46UWOpE2QIQz2RF5kCRHWt0OT?usp=drive_link
-
-```
+- 🌐 Website Aplikasi: [Klik di sini](https://ornate-kulfi-969ab7.netlify.app/)
+- 📁 Google Drive (File Video ): [Klik di sini](https://drive.google.com/drive/folders/1N3Zc8Ne46UWOpE2QIQz2RF5kCRHWt0OT?usp=drive_link)
